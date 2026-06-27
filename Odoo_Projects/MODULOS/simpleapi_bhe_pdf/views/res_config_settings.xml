@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="res_config_settings_view_form_bhe_pdf" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.simpleapi_bhe_pdf</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <app string="SimpleAPI BHE PDF" name="simpleapi_bhe_pdf_settings">
+          <block title="Configuración de SimpleAPI">
+            <setting help="Parámetros de conexión con SimpleAPI Chile">
+              <div class="content-group">
+                <div class="row mt16">
+                  <label for="simpleapi_bhe_api_key" class="col-lg-3 o_light_label"/>
+                  <field name="simpleapi_bhe_api_key" placeholder="API Key SimpleAPI"/>
+                </div>
+                <div class="row">
+                  <label for="simpleapi_bhe_base_url" class="col-lg-3 o_light_label"/>
+                  <field name="simpleapi_bhe_base_url"/>
+                </div>
+                <div class="row">
+                  <label for="simpleapi_bhe_timeout" class="col-lg-3 o_light_label"/>
+                  <field name="simpleapi_bhe_timeout"/>
+                </div>
+              </div>
+            </setting>
+          </block>
+        </app>
+      </xpath>
+    </field>
+  </record>
+</odoo>

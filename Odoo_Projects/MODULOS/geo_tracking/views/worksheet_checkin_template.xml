@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_worksheet_template_form_checkin" model="ir.ui.view">
+        <field name="name">worksheet.template.form.checkin</field>
+        <field name="model">worksheet.template</field>
+        <field name="inherit_id" ref="worksheet.worksheet_template_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Insertar el botón dentro del sheet, al inicio -->
+            <xpath expr="//sheet" position="inside">
+                <button name="action_checkin" type="object" string="Check-in" class="oe_highlight" />
+            </xpath>
+
+            <!-- Insertar los campos debajo de todos los grupos dentro del sheet -->
+            <xpath expr="//sheet/group[last()]" position="after">
+                <group string="Check-in">
+                    <field name="checkin_latitude"/>
+                    <field name="checkin_longitude"/>
+                    <field name="checkin_datetime"/>
+                    <field name="checkin_distance_km"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

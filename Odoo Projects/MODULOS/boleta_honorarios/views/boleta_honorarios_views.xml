@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_boleta_honorarios_form" model="ir.ui.view">
+    <field name="name">boleta.honorarios.form</field>
+    <field name="model">boleta.honorarios</field>
+    <field name="priority">50</field>
+    <field name="arch" type="xml">
+      <form string="Boleta de Honorarios">
+        <header>
+          <button name="action_emitir_boleta" string="Emitir Boleta" type="object" class="btn-primary"/>
+          <button name="action_anular_boleta_path" string="Anular Boleta" type="object" class="btn-danger"
+                  confirm="Se anulará la boleta en el SII usando el motivo seleccionado. ¿Continuar?"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,processing,emitted,downloaded,cancelled,error"/>
+        </header>
+        
+        <sheet>
+          <group>
+            <group string="Información General">
+              <field name="numero_boleta"/>
+              <field name="fecha_emision"/>
+              <field name="currency_id" invisible="1"/>
+            </group>
+            <group string="Estado">
+              <field name="fecha_procesamiento"/>
+              <field name="intentos"/>
+            </group>
+          </group>
+
+          <group string="Datos del Usuario Emisor">
+            <field name="rut_usuario" placeholder="12345678-9"/>
+            <field name="password_sii" password="True"/>
+            <field name="direccion_emisor"/>
+            <field name="retencion"/>
+          </group>
+
+          <group string="Datos del Receptor">
+            <group>
+              <field name="partner_id" options="{'no_create': True}" placeholder="Seleccionar receptor existente (opcional)"/>
+              <field name="receptor_rut" placeholder="12345678-9" required="1"/>
+              <field name="receptor_nombre" required="1"/>
+            </group>
+            <group>
+              <field name="receptor_direccion"/>
+              <field name="receptor_region"/>
+              <field name="receptor_comuna"/>
+            </group>
+          </group>
+
+          <group string="Detalles de la Prestación">
+            <field name="lineas_selector" string="Número de Líneas a Usar"/>
+            
+            <!-- Línea 1 - siempre visible -->
+            <group string="Línea 1">
+              <field name="descripcion_1" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_1" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 2 -->
+            <group string="Línea 2" invisible="lineas_selector in ['1']">
+              <field name="descripcion_2" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_2" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 3 -->
+            <group string="Línea 3" invisible="lineas_selector in ['1', '2']">
+              <field name="descripcion_3" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_3" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 4 -->
+            <group string="Línea 4" invisible="lineas_selector in ['1', '2', '3']">
+              <field name="descripcion_4" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_4" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 5 -->
+            <group string="Línea 5" invisible="lineas_selector in ['1', '2', '3', '4']">
+              <field name="descripcion_5" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_5" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 6 -->
+            <group string="Línea 6" invisible="lineas_selector in ['1', '2', '3', '4', '5']">
+              <field name="descripcion_6" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_6" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 7 -->
+            <group string="Línea 7" invisible="lineas_selector in ['1', '2', '3', '4', '5', '6']">
+              <field name="descripcion_7" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_7" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 8 -->
+            <group string="Línea 8" invisible="lineas_selector in ['1', '2', '3', '4', '5', '6', '7']">
+              <field name="descripcion_8" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_8" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 9 -->
+            <group string="Línea 9" invisible="lineas_selector in ['1', '2', '3', '4', '5', '6', '7', '8']">
+              <field name="descripcion_9" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_9" string="Valor" widget="monetary"/>
+            </group>
+            
+            <!-- Línea 10 -->
+            <group string="Línea 10" invisible="lineas_selector in ['1', '2', '3', '4', '5', '6', '7', '8', '9']">
+              <field name="descripcion_10" string="Descripción" placeholder="Descripción del servicio"/>
+              <field name="valor_10" string="Valor" widget="monetary"/>
+            </group>
+          </group>
+
+          <group string="Envío por correo">
+            <field name="email_destinatario" widget="email" placeholder="correo@dominio.cl" required="1"/>
+          </group>
+
+          <group string="Anulación">
+            <field name="motivo_anulacion"/>
+            <span>Para anular, seleccione un motivo y haga clic en "Anular Boleta".</span>
+          </group>
+
+          <notebook>
+            <page string="Respuesta API">
+              <field name="response_data" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+            </page>
+            <page string="Errores">
+              <field name="error_message" readonly="1"/>
+            </page>
+          </notebook>
+        </sheet>
+
+        <div class="oe_chatter">
+          <field name="message_follower_ids"/>
+          <field name="activity_ids"/>
+          <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_boleta_honorarios_list" model="ir.ui.view">
+    <field name="name">boleta.honorarios.list</field>
+    <field name="model">boleta.honorarios</field>
+    <field name="priority">50</field>
+    <field name="arch" type="xml">
+      <list string="Boletas de Honorarios"
+            decoration-success="state == 'downloaded'"
+            decoration-warning="state == 'processing'"
+            decoration-danger="state == 'error'"
+            decoration-info="state == 'draft'">
+        <field name="numero_boleta"/>
+        <field name="fecha_emision"/>
+        <field name="partner_id"/>
+        <field name="receptor_nombre"/>
+        <field name="email_destinatario"/>
+        <field name="state" widget="badge"/>
+        <field name="fecha_procesamiento"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_boleta_honorarios" model="ir.actions.act_window">
+    <field name="name">Boletas de Honorarios</field>
+    <field name="res_model">boleta.honorarios</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_boleta_honorarios_root" name="Boletas Honorarios" sequence="60"/>
+  <menuitem id="menu_boleta_honorarios" name="Boletas de Honorarios"
+            parent="menu_boleta_honorarios_root" action="action_boleta_honorarios" sequence="10"/>
+</odoo>

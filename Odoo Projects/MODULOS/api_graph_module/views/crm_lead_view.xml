@@ -1,0 +1,59 @@
+<odoo>
+  <record id="action_meta_lead_importer" model="ir.actions.act_window">
+    <field name="name">Meta Leads Importer</field>
+    <field name="res_model">meta.lead.importer</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Importador simple de Meta Leads</p>
+      <p>Configure sus credenciales de Meta y obtenga tokens de acceso</p>
+    </field>
+  </record>
+
+  <record id="view_meta_lead_importer_form" model="ir.ui.view">
+    <field name="name">meta.lead.importer.form</field>
+    <field name="model">meta.lead.importer</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_obtener_token" string="Obtener Token" type="object" class="btn-primary"/>
+        </header>
+        <sheet>
+          <group>
+            <group string="Credenciales de la App">
+              <field name="app_id" placeholder="Ej: 948559193829212"/>
+              <field name="app_secret" password="True" placeholder="Clave secreta de su app"/>
+            </group>
+            <group string="Token de Acceso">
+              <field name="name" readonly="1"/>
+              <field name="fecha_expiracion" readonly="1"/>
+            </group>
+          </group>
+          <div class="alert alert-info" role="alert">
+            <p><strong>Instrucciones:</strong></p>
+            <ul>
+              <li>1. Ingrese el <strong>App ID</strong> y <strong>App Secret</strong> de su aplicación de Meta</li>
+              <li>2. Presione <strong>"Obtener Token"</strong> para autenticarse con Facebook</li>
+              <li>3. Una vez obtenido el token, podrá importar leads desde "Historial de Importación"</li>
+            </ul>
+          </div>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_meta_lead_importer_tree" model="ir.ui.view">
+    <field name="name">meta.lead.importer.tree</field>
+    <field name="model">meta.lead.importer</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="app_id"/>
+        <field name="name"/>
+        <field name="fecha_expiracion"/>
+      </list>
+    </field>
+  </record>
+
+  <menuitem id="menu_meta_leads_root" name="Meta Leads" sequence="90"/>
+  <menuitem id="menu_meta_lead_importer" name="Importador" parent="menu_meta_leads_root"
+            action="action_meta_lead_importer" sequence="10"/>
+</odoo>

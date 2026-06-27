@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Acciones -->
+
+       <!-- Acción que abre los ajustes de Random ERP -->
+        <record id="action_randomerp_settings" model="ir.actions.act_window">
+            <field name="name">Random ERP Settings</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Acciones del cliente (OWL) -->
+        <record id="action_randomerp_connector" model="ir.actions.client">
+            <field name="name">RandomERP Connector</field>
+            <field name="tag">RandomERPConnector</field>
+            <field name="target">current</field>
+        </record>
+
+        <record id="action_randomerp_connector_home" model="ir.actions.client">
+            <field name="name">RandomERP Connector Home</field>
+            <field name="tag">randomerp_connector_home</field>
+            <field name="target">current</field>
+        </record>
+
+        <record id="action_randomerp_connector_products" model="ir.actions.client">
+            <field name="name">Productos</field>
+            <field name="tag">randomerp_connector_products</field>
+            <field name="target">current</field>
+        </record>
+
+        <record id="action_randomerp_connector_action_opcion2" model="ir.actions.client">
+            <field name="name">Opción 2</field>
+            <field name="tag">randomerp_opcion2</field>
+            <field name="target">current</field>
+        </record>
+
+        <!-- Acción para cerrar sesión -->
+        <record id="action_randomerp_logout" model="ir.actions.act_url">
+            <field name="name">Cerrar sesión</field>
+            <field name="url">/randomerp_connector/logout</field>
+            <field name="target">self</field>
+        </record>
+
+        <!-- Menú raíz -->
+        <menuitem 
+            id="menu_random_root"
+            name="Random ERP"
+            sequence="10"
+            web_icon="randomerp_connector,static/description/icon.png"
+            action="action_randomerp_connector"/>
+
+        <!-- Submenú principal "Conector" bajo el menú raíz -->
+        <menuitem 
+            id="menu_random_sub1"
+            name="Integración"
+            parent="menu_random_root"
+            sequence="20"/>
+
+        <!-- Opciones dentro del submenú "Conector" -->
+        <menuitem 
+            id="menu_random_opcion1"
+            name="Productos"
+            parent="menu_random_sub1"
+            action="randomerp_connector.action_randomerp_connector_products"
+            sequence="10"/>
+
+        <menuitem 
+            id="menu_random_opcion2"
+            name="Contactos"
+            parent="menu_random_sub1"
+            action="randomerp_connector.action_randomerp_connector_action_opcion2"
+            sequence="20"/>
+
+        <menuitem 
+            id="menu_random_opcion2"
+            name="Documentos"
+            parent="menu_random_sub1"
+            action="randomerp_connector.action_randomerp_connector_action_opcion2"
+            sequence="30"/>
+
+        <!-- Menú principal "Configuración" al lado de "Conector" -->
+        <menuitem 
+            id="menu_random_configuracion"
+            name="Configuración"
+            parent="menu_random_root"
+            sequence="25"/>
+
+        <!-- Submenú "Ajustes" dentro de "Configuración" -->
+        <menuitem
+            id="menu_random_configuracion_ajustes"
+            name="Ajustes"
+            parent="menu_random_configuracion"
+            action="action_randomerp_settings"
+            sequence="10"/>
+
+        <!-- Cerrar sesión -->
+        <menuitem
+            id="menu_random_logout"
+            name="Cerrar sesión"
+            parent="menu_random_root"
+            action="action_randomerp_logout"
+            sequence="30"
+            groups="randomerp_connector.group_randomerp_logged"/>
+            
+    </data>
+</odoo>

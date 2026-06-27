@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Acción para importar precios -->
+        <record id="action_import_prices_api" model="ir.actions.server">
+            <field name="name">Importar Precios desde API</field>
+            <field name="model_id" ref="stock.model_stock_picking_type"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking_type"/>
+            <field name="state">code</field>
+            <field name="code">
+                action = model.importar_precios_desde_api()
+            </field>
+        </record>
+
+        <!-- Menú en Inventario para precios -->
+        <menuitem id="menu_import_prices_api"
+                  name="Importar Precios API"
+                  parent="stock.menu_stock_root"
+                  action="action_import_prices_api"
+                  sequence="110"/>
+    </data>
+</odoo>

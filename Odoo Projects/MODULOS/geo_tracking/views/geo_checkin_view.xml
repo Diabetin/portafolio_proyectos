@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista heredada para agregar pestaña y botón -->
+    <record id="view_project_task_form_geo_tracking" model="ir.ui.view">
+        <field name="name">project.task.form.geo.tracking</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="geolocation" string="Geolocalización">
+                    <!-- <group col="2">
+                        <group string="Información del Cliente">
+                            <field name="partner_latitude" readonly="1" 
+                                   widget="float" options="{'precision': 6}"/>
+                            <field name="partner_longitude" readonly="1" 
+                                   widget="float" options="{'precision': 6}"/>
+                            <button string="Actualizar Coordenadas Cliente"
+                                    type="object"
+                                    name="action_update_partner_coordinates"
+                                    class="btn-secondary"
+                                    icon="fa-refresh"
+                                    invisible="not partner_id"/>
+                        </group>
+                        <group string="Datos del Check-In">
+                            <field name="checkin_latitude" readonly="1" 
+                                   widget="float" options="{'precision': 6}"/>
+                            <field name="checkin_longitude" readonly="1" 
+                                   widget="float" options="{'precision': 6}"/>
+                            <field name="checkin_datetime" readonly="1"/>
+                            <field name="checkin_distance_km" readonly="1" 
+                                   widget="float" options="{'precision': 3}"/>
+                        </group>
+                    </group> -->
+                    <group string="Datos del Check-In">
+                        <field name="checkin_latitude" readonly="1" 
+                                widget="float" options="{'precision': 6}"/>
+                        <field name="checkin_longitude" readonly="1" 
+                                widget="float" options="{'precision': 6}"/>
+                        <field name="checkin_datetime" readonly="1"/>
+                        <field name="checkin_distance_km" readonly="1" 
+                                widget="float" options="{'precision': 3}"/>
+                    </group>
+                    <div class="oe_button_box" style="text-align: center; margin-top: 20px;">
+                        <button string="Registrar Check-In"
+                                type="object"
+                                name="get_location_button"
+                                class="btn-primary oe_highlight"
+                                icon="fa-map-marker"
+                                invisible="not partner_id"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_meta_lead_importer_user,meta.lead.importer.user,model_meta_lead_importer,base.group_user,1,1,1,1
+access_meta_lead_import_log_user,meta.lead.import.log.user,model_meta_lead_import_log,base.group_user,1,1,1,0
+access_meta_lead_import_log_manager,meta.lead.import.log.manager,model_meta_lead_import_log,base.group_system,1,1,1,1

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_simpleapi_bhe_pdf_form" model="ir.ui.view">
+    <field name="name">simpleapi.bhe.pdf.form</field>
+    <field name="model">simpleapi.bhe.pdf</field>
+    <field name="arch" type="xml">
+      <form string="PDF BHE (SII)">
+        <header>
+          <button name="action_fetch_pdf" type="object" string="Obtener PDF" class="btn-primary"/>
+          <field name="pdf_filename" readonly="1"/>
+        </header>
+        <sheet>
+          <group>
+            <group string="Parámetros">
+              <field name="folio"/>
+              <field name="anio" options="{'no_format': True}"/>
+            </group>
+            <group string="Credenciales SII">
+              <field name="rut_usuario" placeholder="12345678-9"/>
+              <field name="password_sii" password="True"/>
+            </group>
+          </group>
+          <group string="Estado">
+            <field name="last_status" readonly="1"/>
+          </group>
+          <group string="Visor PDF">
+            <field name="pdf_iframe_html" widget="html" readonly="1"/>
+          </group>
+        </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids" widget="mail_followers"/>
+          <field name="activity_ids" widget="mail_activity"/>
+          <field name="message_ids" widget="mail_thread"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_simpleapi_bhe_pdf_list" model="ir.ui.view">
+    <field name="name">simpleapi.bhe.pdf.list</field>
+    <field name="model">simpleapi.bhe.pdf</field>
+    <field name="arch" type="xml">
+      <list string="Consultas PDF BHE">
+        <field name="name"/>
+        <field name="folio"/>
+        <field name="anio"/>
+        <field name="pdf_filename"/>
+        <field name="last_status"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_simpleapi_bhe_pdf" model="ir.actions.act_window">
+    <field name="name">PDF Boleta Honorarios</field>
+    <field name="res_model">simpleapi.bhe.pdf</field>
+    <field name="view_mode">list,form</field>
+  </record>
+
+  <menuitem id="menu_simpleapi_bhe_root" name="SimpleAPI" sequence="40"/>
+  <menuitem id="menu_simpleapi_bhe_pdf" name="PDF BHE"
+            parent="menu_simpleapi_bhe_root" action="action_simpleapi_bhe_pdf" sequence="10"/>
+</odoo>

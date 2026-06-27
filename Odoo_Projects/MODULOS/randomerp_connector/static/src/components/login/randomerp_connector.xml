@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="randomerp_connector.RandomERPConnector">
+        <div class="randomerp-connector text-center">
+
+            <!-- Imagen centrada -->
+            <img src="/randomerp_connector/static/src/components/img/logo.png" 
+                 alt="Random ERP Logo" 
+                 class="mb-4" 
+                 style="max-width: 150px;"/>
+
+            <!-- Inputs -->
+            <div class="mb-3" style="width: 40%; margin: 0 auto;">
+                <input type="text" class="form-control" placeholder="Usuario" t-ref="username"/>
+            </div>
+            <div class="mb-3" style="width: 40%; margin: 0 auto;">
+                <input type="password" class="form-control" placeholder="Contraseña" t-ref="password"/>
+            </div>
+
+            <!-- Botón -->
+            <button type="button"
+                    class="btn"
+                    t-att-class="{
+                        'btn-success': state.loginMethod === 'token',
+                        'btn-primary': state.loginMethod === 'userpass'
+                    }"
+                    t-on-click="login">
+                Iniciar sesión
+            </button>
+        </div>
+    </t>
+</templates>

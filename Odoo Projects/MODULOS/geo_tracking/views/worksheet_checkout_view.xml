@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_worksheet_template_form_checkout" model="ir.ui.view">
+        <field name="name">worksheet.template.form.checkout</field>
+        <field name="model">worksheet.template</field>
+        <field name="inherit_id" ref="worksheet.worksheet_template_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar botón de check-out junto al botón de check-in -->
+            <xpath expr="//button[@name='action_checkin']" position="after">
+                <button name="action_checkout" 
+                        type="object" 
+                        string="Check-out" 
+                        class="oe_highlight btn-warning" 
+                        invisible="checkin_status != 'checked_in'"/>
+            </xpath>
+                        
+            <!-- Modificar el botón de check-in para que solo aparezca cuando no hay check-in -->
+            <xpath expr="//button[@name='action_checkin']" position="attributes">
+                <attribute name="invisible">checkin_status != 'none'</attribute>
+            </xpath>
+            
+            <!-- Agregar campos de check-out y duración después del último grupo -->
+            <xpath expr="//sheet//group[last()]" position="after">
+                <group string="Check-out">
+                    <field name="visit_duration"/>
+                    <field name="visit_duration_formatted"/>
+                    <field name="checkin_status"/>
+                </group>
+            </xpath>
+            
+            <!-- Agregar widget de estado visual al inicio del sheet -->
+            <xpath expr="//sheet" position="inside">
+                <div class="alert alert-info"
+                     role="status" 
+                     invisible="checkin_status == 'none'" 
+                     style="margin-bottom: 10px;">
+                    <strong>Estado:</strong>
+                    <span invisible="checkin_status != 'checked_in'">
+                        ✓ Check-in realizado - Esperando check-out
+                    </span>
+                    <span invisible="checkin_status != 'checked_out'">
+                        ✓ Visita completada - Duración: <field name="visit_duration_formatted" readonly="1" nolabel="1"/>
+                    </span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

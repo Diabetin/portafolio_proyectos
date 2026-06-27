@@ -1,0 +1,103 @@
+<odoo>
+  <!-- Acción de ventana para abrir la lista -->
+  <record id="action_meta_import_log" model="ir.actions.act_window">
+    <field name="name">Historial de Importación</field>
+    <field name="res_model">meta.lead.import.log</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Historial de importaciones</p>
+      <p>Lista con "Importación" y "Fecha de importación".</p>
+    </field>
+  </record>
+
+  <!-- Lista con columnas expandidas -->
+  <record id="view_meta_import_log_tree" model="ir.ui.view">
+    <field name="name">meta.lead.import.log.tree</field>
+    <field name="model">meta.lead.import.log</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="token_importer_id"/>
+        <field name="fecha_importacion"/>
+        <field name="leads_importados"/>
+        <field name="estado"/>
+      </list>
+    </field>
+  </record>
+
+  <!-- Formulario con selector de token y botón de importación -->
+  <record id="view_meta_import_log_form" model="ir.ui.view">
+    <field name="name">meta.lead.import.log.form</field>
+    <field name="model">meta.lead.import.log</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <!-- Solo mostrar el botón "Importar" cuando está en borrador -->
+          <button name="action_importar_leads" 
+                  string="Importar Leads" 
+                  type="object" 
+                  class="btn-primary"
+                  invisible="estado != 'borrador'"/>
+        </header>
+        <sheet>
+          <group>
+            <group>
+              <field name="name"/>
+              <field name="token_importer_id" 
+                     options="{'no_create': True, 'no_edit': True}"
+                     invisible="estado != 'borrador'"/>
+              <field name="fecha_importacion"/>
+              <field name="estado"/>
+            </group>
+            <group>
+              <field name="leads_importados"/>
+            </group>
+          </group>
+          
+          <!-- Información del token seleccionado -->
+          <group string="Información del Token Seleccionado" invisible="not token_importer_id">
+            <group>
+              <label for="token_importer_id" string="App ID:"/>
+              <div>
+                <field name="token_importer_id" 
+                       widget="char" 
+                       options="{'field': 'app_id'}" 
+                       readonly="True" 
+                       nolabel="1"/>
+              </div>
+              <label for="token_importer_id" string="Fecha de expiración:"/>
+              <div>
+                <field name="token_importer_id" 
+                       widget="char" 
+                       options="{'field': 'fecha_expiracion'}" 
+                       readonly="True" 
+                       nolabel="1"/>
+              </div>
+            </group>
+          </group>
+          
+          <group string="Resultado de la Importación">
+            <field name="mensaje" widget="text"/>
+          </group>
+          
+          <!-- Alerta informativa -->
+          <div class="alert alert-info" role="alert" invisible="estado != 'borrador'">
+            <p><strong>Instrucciones:</strong></p>
+            <ul>
+              <li>1. Selecciona el <strong>Token a usar</strong> de la lista de tokens disponibles</li>
+              <li>2. Presiona <strong>"Importar Leads"</strong> para comenzar la importación automática</li>
+              <li>3. El sistema buscará en todas las cuentas y anuncios asociados al token seleccionado</li>
+            </ul>
+          </div>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <!-- Nuevo botón en el menú -->
+  <menuitem id="menu_meta_import_log"
+            name="Historial de Importación"
+            parent="menu_meta_leads_root"
+            action="action_meta_import_log"
+            sequence="20"/>
+</odoo>

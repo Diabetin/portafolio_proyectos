@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="bhe_assets_backend" name="BHE Assets" inherit_id="web.assets_backend">
+    <xpath expr="." position="inside">
+      <script type="module" src="/boleta_honorarios/static/src/js/preview_iframe.js"/>
+    </xpath>
+  </template>
+</odoo>

@@ -1,0 +1,150 @@
+:root {
+    --primary-color: #0d1117;
+    --secondary-color: #21262d;
+    --accent-color: #58a6ff;
+    --success-color: #238636;
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Contenedor afectado por el plugin Starfield */
+#space-bg {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.navbar {
+    background: rgba(13, 17, 23, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #30363d;
+}
+
+/* Evitar que el dropdown se recorte */
+header,
+.navbar,
+.navbar .container {
+    overflow: visible !important;
+}
+
+.navbar-brand {
+    font-weight: 900;
+    font-size: 1.8rem;
+    background: linear-gradient(45deg, #58a6ff, #79c0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-section {
+    background: none; /* el fondo estelar ya lo da Starfield */
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.product-card {
+    transition: all 0.4s ease;
+    border: 1px solid #30363d;
+    background: rgba(33, 38, 45, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.product-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(88, 166, 255, 0.3);
+    border-color: #58a6ff;
+}
+
+.cart-badge {
+    background: linear-gradient(45deg, #58a6ff, #79c0ff);
+    font-weight: 700;
+}
+
+/* Dropdown carrito */
+#dropdown-carrito {
+    max-height: 70vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    background: rgba(13, 17, 23, 0.97);
+    border: 1px solid #30363d;
+    min-width: 320px;
+    width: 420px;
+}
+
+#dropdown-carrito .dropdown-header {
+    color: #ffffff;
+    border-bottom: 1px solid #30363d;
+}
+
+#dropdown-carrito .dropdown-item {
+    background-color: transparent;
+    color: #ffffff;
+}
+
+#dropdown-carrito .dropdown-item:hover {
+    background-color: rgba(88, 166, 255, 0.1);
+}
+
+@media (min-width: 992px) {
+    .navbar .dropdown-menu-end {
+        margin-top: 1rem;
+    }
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #58a6ff, #79c0ff);
+    border: none;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(88, 166, 255, 0.4);
+}
+
+.footer {
+    background: var(--primary-color);
+    border-top: 1px solid #30363d;
+}
+
+.section-title {
+    font-weight: 900;
+    background: linear-gradient(45deg, #ffffff, #58a6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 40vh;
+    }
+
+    #dropdown-carrito {
+        width: 100%;
+        max-width: 100vw;
+    }
+}
+/* Nave espacial que cruza la pantalla */
+#spaceship {
+    position: fixed;
+    top: 50%;
+    left: -80px;             /* empieza fuera de pantalla */
+    font-size: 2.5rem;
+    z-index: 9999;
+    pointer-events: none;    /* no bloquea clics */
+    filter: drop-shadow(0 0 8px rgba(88, 166, 255, 0.8));
+    transition: transform 0.2s;
+}
+
+#spaceship.flip {
+    transform: scaleX(-1);   /* voltear nave si va de derecha a izquierda */
+}
