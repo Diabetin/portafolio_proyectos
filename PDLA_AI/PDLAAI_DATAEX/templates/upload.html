@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Subir Documento - PDLA AI{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">
+                {% block page_title %}Sube tu Currículum{% endblock %}
+            </h1>
+            <p class="text-gray-500 text-sm">
+                {% block upload_description %}Sube tu documento PDF para procesarlo.{% endblock %}
+            </p>
+        </div>
+
+        <form action="{% block form_action %}{% endblock %}" method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="flex items-center justify-center w-full">
+                <label for="cv_pdf" class="flex flex-col items-center justify-center w-full h-48 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer bg-blue-50 hover:bg-blue-100 transition-colors duration-300">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-12 h-12 mb-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-700"><span class="font-semibold">Haz clic para seleccionar</span> un archivo</p>
+                        <p class="text-xs text-gray-500">Solo se permiten archivos .PDF</p>
+                    </div>
+                    <input id="cv_pdf" name="cv_pdf" type="file" accept=".pdf" class="hidden" required />
+                </label>
+            </div>
+
+            {% block extra_form_fields %}
+            {% endblock %}
+
+            <!-- Botón predeterminado restaurado -->
+            {% block submit_button %}
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md flex justify-center items-center gap-2">
+                <span>Subir y procesar archivo</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </button>
+            {% endblock %}
+            
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('cv_pdf').addEventListener('change', function(e) {
+            var fileName = e.target.files[0].name;
+            var labelText = e.target.parentElement.querySelector('p span.font-semibold');
+            labelText.textContent = 'Archivo seleccionado: ' + fileName;
+            labelText.parentElement.classList.add('text-blue-600');
+        });
+    </script>
+</body>
+</html>

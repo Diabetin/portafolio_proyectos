@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Datos Extraídos{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Visor del PDF (Sección Fija Compartida) -->
+        <div class="bg-white p-4 rounded shadow-lg h-[80vh]">
+            <h2 class="text-xl font-bold mb-4">PDF Original</h2>
+            <embed src="{{ pdf_url }}" type="application/pdf" width="100%" height="90%">
+        </div>
+
+        <!-- Columna Derecha (Sección Dinámica Extensible) -->
+        <div class="bg-white p-6 rounded shadow-lg h-[80vh] overflow-y-auto flex flex-col justify-between">
+            
+            <div class="flex-grow">
+                <h1 class="text-2xl font-bold text-blue-600 mb-6">
+                    {% block page_title %}Datos extraídos del currículum{% endblock %}
+                </h1>
+                
+                <!-- BLOQUE 1: Datos Base (Se pueden sobreescribir o mantener) -->
+                {% block extracted_data_content %}
+                <ul class="space-y-4 text-gray-700">
+                    <li class="border-b pb-2"><strong class="text-gray-900">Nombre:</strong> {{ extracted_data.name }}</li>
+                    <li class="border-b pb-2"><strong class="text-gray-900">Email:</strong> {{ extracted_data.email }}</li>
+                    <li class="border-b pb-2"><strong class="text-gray-900">Teléfono:</strong> {{ extracted_data.phone }}</li>
+                    
+                    <li class="border-b pb-2">
+                        <strong class="text-gray-900 block mb-1">Educación:</strong> 
+                        <ul class="list-disc pl-5 text-sm">
+                            {% for item in extracted_data.education %}
+                                <li><strong>{{ item.degree }}</strong> - {{ item.institution }} ({{ item.year }})</li>
+                            {% empty %}
+                                <li>No se encontró información.</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    
+                    <li class="border-b pb-2">
+                        <strong class="text-gray-900 block mb-1">Experiencia laboral:</strong> 
+                        <ul class="list-disc pl-5 text-sm space-y-3">
+                            {% for item in extracted_data.work_experience %}
+                                <li>
+                                    <strong class="text-gray-800">{{ item.position }}</strong> en {{ item.company }} 
+                                    <span class="text-gray-500 text-xs ml-1">({{ item.year }})</span>
+                                    {% if item.description %}
+                                        <p class="text-gray-600 mt-1">{{ item.description }}</p>
+                                    {% endif %}
+                                </li>
+                            {% empty %}
+                                <li class="text-gray-500">No se encontró información.</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    
+                    <li class="border-b pb-2">
+                        <strong class="text-gray-900 block mb-2">Habilidades:</strong> 
+                        <div class="flex flex-wrap gap-2">
+                            {% for skill in extracted_data.skills %}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                    {{ skill }}
+                                </span>
+                            {% empty %}
+                                <span class="text-gray-500 text-sm">No se encontraron habilidades.</span>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    
+                    <li class="border-b pb-2">
+                        <strong class="text-gray-900 block mb-1">Idiomas:</strong> 
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            {% for language in extracted_data.languages %}
+                                <li>{{ language }}</li>
+                            {% empty %}
+                                <li class="text-gray-500 text-sm">No se encontraron idiomas.</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                {% endblock %}
+
+                <!-- BLOQUE 2: Nuevas funcionalidades exclusivas de otras apps -->
+                {% block extra_features %}
+                {% endblock %}
+            </div>
+            
+            <!-- BLOQUE 3: Botones de Acción -->
+            <div class="mt-8 pt-4 border-t flex gap-4">
+                {% block action_buttons %}
+                <a href="/upload/" class="inline-block bg-gray-800 text-white py-2 px-4 rounded hover:bg-gray-900">Subir otro CV</a>
+                {% endblock %}
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

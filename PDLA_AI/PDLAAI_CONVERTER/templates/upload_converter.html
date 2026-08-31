@@ -1,0 +1,18 @@
+{% extends 'upload.html' %}
+
+{% block title %}Convertir a LaTeX - PDLA AI{% endblock %}
+{% block page_title %}Generador de CV en LaTeX{% endblock %}
+{% block upload_description %}Sube tu PDF para generar el código fuente en formato .tex.{% endblock %}
+
+<!-- Forzamos la ruta exclusiva para la vista de la App 2 -->
+{% block form_action %}/converter/{% endblock %}
+
+<!-- Este bloque reemplaza por completo al botón heredado de la plantilla base -->
+{% block submit_button %}
+<button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md flex justify-center items-center gap-2">
+    <span>Generar y Mostrar LaTeX</span>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+    </svg>
+</button>
+{% endblock %}
