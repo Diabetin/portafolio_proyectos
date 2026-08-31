@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="randomerp_connector.randomerp_connector_home">
+        <div class="home d-flex flex-column align-items-center justify-content-center" style="height:100vh;">
+            <h1>Bienvenido al home 🚀</h1>
+            <p>Esto es lo que se muestra después de iniciar sesión.</p>
+        </div>
+    </t>
+</templates>

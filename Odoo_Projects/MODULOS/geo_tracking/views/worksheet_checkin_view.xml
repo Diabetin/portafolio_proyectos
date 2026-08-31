@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>  
+        <record id="view_project_task_worksheet_form_checkin" model="ir.ui.view">
+            <field name="name">project.task.worksheet.form.checkin</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_1"/> <field name="arch" type="xml">
+
+                <xpath expr="//div[1]" position="before"> <div>
+                        <button name="action_checkin" 
+                                type="object" 
+                                string="Realizar Check-in" 
+                                class="btn-primary"
+                                attrs="{'invisible': [('has_checkin', '=', True)]}"
+                                help="Registrar ubicación actual para esta tarea"
+                                icon="fa-map-marker"/>
+                        
+                        <button name="action_reset_checkin" 
+                                type="object" 
+                                string="Resetear Check-in" 
+                                class="btn-secondary"
+                                attrs="{'invisible': [('has_checkin', '=', False)]}"
+                                help="Eliminar datos de check-in (solo para testing)"
+                                groups="base.group_system"
+                                icon="fa-refresh"/>
+                        
+                        <field name="stage_id" invisible="1"/> </div>
+
+                    <field name="has_checkin" invisible="1"/> <group string="Información de Check-in" 
+                           attrs="{'invisible': [('has_checkin', '=', False)]}"
+                           col="4">
+                        <group string="Ubicación" col="2">
+                            <field name="checkin_latitude" 
+                                   readonly="1"
+                                   widget="float" 
+                                   digits="[16,6]"/>
+                            <field name="checkin_longitude" 
+                                   readonly="1"
+                                   widget="float" 
+                                   digits="[16,6]"/>
+                        </group>
+                        <group string="Detalles" col="2">
+                            <field name="checkin_datetime" 
+                                   readonly="1"
+                                   widget="datetime"/>
+                            <field name="checkin_distance_km" 
+                                   readonly="1"
+                                   widget="float" 
+                                   digits="[16,2]"/>
+                        </group>
+                    </group>
+                    
+                    <div class="alert alert-success" 
+                         attrs="{'invisible': [('has_checkin', '=', False)]}"
+                         role="status">
+                        <p><i class="fa fa-check-circle" title="Check-in completado"/> <strong>Check-in completado</strong></p>
+                        <p>El técnico se registró exitosamente en la ubicación del cliente.</p>
+                    </div>
+                    
+                    <div class="alert alert-info" 
+                         attrs="{'invisible': [('has_checkin', '=', True)]}"
+                         role="status">
+                        <p><i class="fa fa-info-circle" title="Check-in pendiente"/> <strong>Check-in pendiente</strong></p>
+                        <p>El técnico debe hacer check-in al llegar a la ubicación del cliente.</p>
+                        <p>Haz clic en el botón <strong>"Realizar Check-in"</strong> en la parte superior.</p>
+                    </div>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="view_project_task_tree_checkin" model="ir.ui.view">
+            <field name="name">project.task.tree.checkin</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="after">
+                    <field name="has_checkin" 
+                           string="Check-in"
+                           widget="boolean_toggle"
+                           readonly="1"
+                           optional="show"/>
+                    <field name="checkin_datetime" 
+                           string="Fecha Check-in"
+                           optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_project_task_search_checkin" model="ir.ui.view">
+            <field name="name">project.task.search.checkin</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_tasks']" position="after">
+                    <separator/>
+                    <filter name="with_checkin" 
+                            string="Con Check-in"
+                            domain="[('has_checkin', '=', True), ('is_fsm', '=', True)]"/>
+                    <filter name="without_checkin" 
+                            string="Sin Check-in"
+                            domain="[('has_checkin', '=', False), ('is_fsm', '=', True)]"/>
+                </xpath>
+                <xpath expr="//group" position="inside">
+                    <filter name="group_by_checkin_status" 
+                            string="Estado Check-in" 
+                            context="{'group_by': 'has_checkin'}"
+                            groups="industry_fsm.group_fsm_manager"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

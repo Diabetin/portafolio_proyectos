@@ -1,0 +1,29 @@
+<odoo>
+  <record id="res_config_settings_view_form_randomerp" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.inherit.randomerp</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="priority" eval="15"/>
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <app string="Random ERP" name="randomerp_connector">
+          <block title="RandomERP Connector Settings" name="randomerp_settings_block">
+
+            <setting string="Login">
+              <field name="randomerp_login_method" widget="radio"/>
+            </setting>
+
+            <setting string="Token" depends="randomerp_login_method">
+                <field name="randomerp_token" placeholder="Ingrese su token aquí"/>
+            </setting>
+
+            <setting string="API URL">
+                <field name="randomerp_api_url" placeholder="Ingrese la URL de la API aquí"/>
+            </setting>
+
+          </block>
+        </app>
+      </xpath>
+    </field>
+  </record>
+</odoo>

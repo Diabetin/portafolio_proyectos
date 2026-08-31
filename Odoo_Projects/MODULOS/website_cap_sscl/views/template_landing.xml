@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <template id="template_landing" name="Landing Invertir en propiedades">
+      <html>
+        <head>
+          <meta charset="utf-8"/>
+          <meta name="viewport" content="width=device-width, initial-scale=1"/>
+          <title>Invertir en propiedades — Landing</title>
+          <style>
+            :root{
+              --bg:#ffffff;
+              --accent:#ff8a00;
+              --muted:#6b7280;
+              --primary:#0b3b66;
+              --card:#f7f8fb;
+              --radius:16px;
+              --yellowbg:#ffe1a8;
+              --blackbg:#111111;
+            }
+            html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Helvetica Neue',Arial;background:var(--bg);color:#111}
+            .container{max-width:1100px;margin:0 auto;padding:32px}
+            .hero-flex{display:flex;gap:36px;align-items:center;}
+            .hero-img{max-width:420px;width:100%;border-radius:22px;box-shadow:0 2px 16px rgba(0,0,0,0.08);object-fit:cover;height:auto;display:block;}
+            .main-title{font-size:34px;font-weight:700;color:var(--primary);margin-bottom:18px}
+            .desc{color:var(--muted);line-height:1.6;margin-bottom:6px;}
+            .cta-group{margin-top:18px;display:flex;gap:12px}
+            .btn{padding:12px 18px;border-radius:25px;border:2px solid #000;cursor:pointer;font-weight:600;background:#fff}
+            .btn-primary{background:var(--accent);color:#fff;border:0}
+            .btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+            .btn-block{width:100%;margin-bottom:10px;}
+            .btn:disabled{opacity:0.6;cursor:not-allowed;}
+            .section{margin-top:48px;}
+            .subtitle{font-size:26px;font-weight:700;margin:24px 0 10px 0;color:var(--primary);}
+            .desc-small{color:var(--muted);line-height:1.5;margin-bottom:10px;}
+            .steps{display:flex;gap:30px;justify-content:space-between;margin:28px 0;}
+            .step-card{background:var(--card);border-radius:16px;padding:20px 18px;text-align:center;flex:1;min-width:180px;}
+            .step-num{font-size:32px;font-weight:800;color:var(--accent);}
+            .projects{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+            .project{background:white;border-radius:12px;padding:12px;border:1px solid #eef2f7;display:flex;flex-direction:column;align-items:center;}
+            .project-img{width:100%;max-width:340px;border-radius:12px;object-fit:cover;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.09);}
+            .project h3{margin:8px 0;color:var(--primary);font-size:18px;text-align:left;width:100%;}
+            .project .meta{font-size:13px;color:var(--muted);width:100%;}
+            .project .price{font-weight:700;margin-top:8px;width:100%;}
+            .conocemas-section{background:var(--blackbg);padding:60px 0;color:white;display:flex;justify-content:center;gap:44px;flex-wrap:wrap;}
+            .conocemas-info{max-width:400px;}
+            .conocemas-title{font-size:28px;font-weight:700;color:var(--accent);margin-bottom:20px;}
+            .conocemas-card{border:1px solid #fff;padding:12px 18px;border-radius:9px; margin-bottom:18px; background:transparent;}
+            .conocemas-card strong{color:var(--accent);}
+            .form-container{background:#fff;padding:28px 24px;border-radius:18px;box-shadow:0 4px 20px rgba(0,0,0,0.08);color:#111;min-width:290px;max-width:400px;}
+            .form-title{font-weight:700;font-size:28px;margin-bottom:10px;color:#111;}
+            .small{font-size:14px;color:var(--muted);}
+            .row{margin-bottom:16px}
+            .option-group{margin-bottom:16px;}
+            .option-group label{font-weight:600;display:block; margin-bottom:2px;}
+            .option-btn{display:block;width:100%;padding:12px 16px;border-radius:10px;background:#57aaff;font-weight:600;font-size:1rem;color:white;border:none;margin-bottom:8px;cursor:pointer;text-align:left;}
+            .option-btn.selected{background:#0b3b66;color:#fff;}
+            .option-btn:focus{outline:2px solid var(--accent);}
+            @media(max-width:980px){.hero-flex{flex-direction:column;gap:18px;}.projects{grid-template-columns:repeat(2,1fr);}.steps{flex-direction:column;}.conocemas-section{flex-direction:column;align-items:center;gap:0;}}
+            @media(max-width:600px){.projects{grid-template-columns:1fr}.steps{flex-direction:column}.conocemas-section{padding:32px 0;}}
+            .popup-confirm {
+                position: fixed;
+                left: 0; top: 0; width: 100vw; height: 100vh;
+                background: rgba(255,255,255,0.87);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 1001;
+              }
+              .popup-content {
+                background: #fff; border-radius: 18px; box-shadow: 0 4px 18px #178ed222;
+                text-align: center; padding: 42px 30px; min-width: 320px; min-height: 240px;
+                display: flex; flex-direction: column; justify-content: center; align-items: center;
+              }
+              .popup-icon {
+                font-size: 56px; color: #178ed2; margin-bottom: 22px;
+              }
+              .popup-title {
+                font-size: 2rem; color: #178ed2; font-weight: bold; margin-bottom: 8px;
+              }
+              .popup-subtitle {
+                font-size: 1.07rem; color: #444; margin-bottom: 20px;
+              }
+              .popup-text {
+                font-size: 1rem; color: #888;
+              }
+          </style>
+
+        </head>
+        <body>
+          <div class="container">
+            <!-- Hero principal -->
+            <section class="hero-flex">
+                <!-- Popup de confirmación oculto por defecto -->
+                <div class="popup-confirm" id="popupConfirm" style="display:none;">
+                  <div class="popup-content">
+                    <div class="popup-icon">&#10003;</div>
+                    <div class="popup-title">Confirmado</div>
+                    <div class="popup-subtitle">Cita creada exitosamente.</div>
+                    <div class="popup-text" id="popupRedirectText">Redirigiendo ...</div>
+                  </div>
+                </div>
+              <div>
+                <div class="main-title">Invertir en deptos es más simple de lo que crees.</div>
+                <div class="desc">Encontramos el proyecto perfecto para tu bolsillo, gestionamos tu crédito hipotecario y nos encargamos de todo el proceso. Sin cobrarte nunca comisión.</div>
+                <div class="cta-group">
+                  <button class="btn btn-primary" onclick="document.getElementById('proyectos').scrollIntoView({behavior: 'smooth'})">Quiero ver proyectos destacados</button>
+                  <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Quiero agendar mi reunión online</button>
+                </div>
+              </div>
+              <img class="hero-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Invertir en Deptos"/>
+            </section>
+            <!-- Invertir es simple: pasos -->
+            <section class="section">
+              <div class="subtitle">Invertir es simple</div>
+              <div class="desc-small">Las mejores oportunidades del mercado inmobiliario y el acompañamiento personalizado que necesitas, todo en un solo lugar.</div>
+              <div class="steps">
+                <div class="step-card">
+                  <div class="step-num">1</div>
+                  <div style="font-weight:600">Elige tu inversión</div>
+                  <div class="small">Haz click en el activo inmobiliario de tu interés.</div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">2</div>
+                  <div style="font-weight:600">Completa el formulario</div>
+                  <div class="small">Completa el formulario para conocer tu perfil financiero.</div>
+                </div>
+                <div class="step-card">
+                  <div class="step-num">3</div>
+                  <div style="font-weight:600">Agenda tu reunión online</div>
+                  <div class="small">Agenda una reunión y calculamos en qué te conviene invertir hoy.</div>
+                </div>
+              </div>
+            </section>
+            <!-- Proyectos destacados -->
+            <section class="section" id="proyectos">
+              <div class="subtitle">Proyectos destacados</div>
+              <div class="desc-small">De alta plusvalía para rentabilizar tu inversión.</div>
+              <div class="projects">
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Clic"/>
+                  <div class="meta">Estación Central</div>
+                  <h3>Clic</h3>
+                  <div class="small">Paga el pie en hasta 36 cuotas · Cuotas para el pie desde $36.000<br/>Renta mínima sugerida: $1.500.000</div>
+                  <div class="price">Desde UF 1.685</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Tocornal 670"/>
+                  <div class="meta">Santiago</div>
+                  <h3>Tocornal 670</h3>
+                  <div class="small">Paga el pie en hasta 60 cuotas · Cuotas para el pie desde $167.000<br/>Renta mínima sugerida: $1.500.000</div>
+                  <div class="price">Desde UF 2.589</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Valle Los Ingleses III"/>
+                  <div class="meta">Valparaíso</div>
+                  <h3>Valle Los Ingleses III</h3>
+                  <div class="small">Entrega inmediata · Inversión SIN PIE<br/>Renta mínima sugerida: $1.500.000</div>
+                  <div class="price">Desde UF 3.589</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Vicuña Mackenna 1432"/>
+                  <div class="meta">Ñuñoa</div>
+                  <h3>Vicuña Mackenna 1432</h3>
+                  <div class="small">Arriendo garantizado por 3 años.<br/>Paga el pie en hasta 48 cuotas desde $144.000<br/>Renta mínima sugerida: $2.000.000</div>
+                  <div class="price">Desde UF 3.179</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Edificio Nexus Vespucio"/>
+                  <div class="meta">La Cisterna</div>
+                  <h3>Edificio Nexus Vespucio</h3>
+                  <div class="small">Paga el pie en hasta 48 cuotas · Cuotas para el pie desde $94.000<br/>Renta mínima sugerida: $1.700.000</div>
+                  <div class="price">Desde UF 2.340</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+                <article class="project">
+                  <img class="project-img" src="https://conoce.capitalizarme.com/wp-content/uploads/2023/12/header-landing-v30.jpg" alt="Proyecto Bugdepa seminuevos"/>
+                  <div class="meta">Santiago</div>
+                  <h3>Bugdepa seminuevos</h3>
+                  <div class="small">Paga el pie en hasta 60 cuotas · Cuotas para el pie desde $275.000<br/>Renta mínima sugerida: $1.500.000</div>
+                  <div class="price">Desde UF 1.700</div>
+                  <div style="margin-top:10px">
+                    <button class="btn btn-outline" onclick="document.getElementById('form').scrollIntoView({behavior: 'smooth'})">Me interesa</button>
+                  </div>
+                </article>
+              </div>
+            </section>
+            <!-- Conoce más + Formulario -->
+            <section class="conocemas-section section" id="form">
+              <div class="conocemas-info">
+                <div class="conocemas-title">Conoce más</div>
+                <div class="conocemas-card"><strong>Reunión online costo $0</strong><br/><span class="small">Ah, y no te cobraremos nunca comisión.</span></div>
+                <div class="conocemas-card"><strong>Atención de profesionales.</strong><br/><span class="small">Equipo formado y capacitado para resolver tus dudas.</span></div>
+                <div class="conocemas-card"><strong>Nos hacemos cargo de la burocracia.</strong><br/><span class="small">¿Pre-aprobación? ¿Gestión del crédito hipotecario? ¿Trámites?<br/>Nos hacemos cargo de todo, siempre buscando las mejores condiciones.</span></div>
+              </div>
+              <div class="form-container">
+                <div class="form-title">Descubre cómo funciona</div>
+                <p class="small">Regístrate y agenda una reunión sin costo con un broker de nuestro equipo.</p>
+                <form id="landingForm">
+                  <!-- Paso 1: Datos personales -->
+                  <div id="step1">
+                    <div class="row"><input type="text" name="nombre" placeholder="¿Cómo te llamas?" required="required"/></div>
+                    <div class="row"><input type="text" name="apellido" placeholder="¿Cuál es tu apellido?" required="required"/></div>
+                    <div class="row"><input type="tel" name="telefono" placeholder="¿Cuál es tu teléfono?" required="required"/></div>
+                    <div class="row"><input type="email" name="email" placeholder="¿Cuál es tu email?" required="required"/></div>
+                    <div class="row"><button type="button" class="btn btn-primary btn-block" id="nextBtn">Siguiente</button></div>
+                  </div>
+                  <!-- Paso 2: Preguntas de perfil financiero -->
+                  <div id="step2" style="display:none;">
+                    <div class="row option-group">
+                      <label>¿Cuál es tu renta líquida? <span class="small"><br>Hoy, las entidades financieras solicitan para la gestión del crédito hipotecario una renta mínima desde $1.400.000.</br></span></label>
+                      <button type="button" class="option-btn" data-name="renta" data-value="1">Entre $1.000.001-$1.400.000</button>
+                      <button type="button" class="option-btn" data-name="renta" data-value="2">Entre $1.400.001-$1.800.000</button>
+                      <button type="button" class="option-btn" data-name="renta" data-value="3">Más de $1.800.001</button>
+                    </div>
+                    <div class="row option-group">
+                      <label>¿Cuál es tu capacidad de ahorro mensual aproximadamente?</label>
+                      <button type="button" class="option-btn" data-name="ahorro" data-value="0">No tengo capacidad de ahorro mensual</button>
+                      <button type="button" class="option-btn" data-name="ahorro" data-value="100-200">Entre $100.000-$200.000</button>
+                      <button type="button" class="option-btn" data-name="ahorro" data-value="200-400">Entre $200.001-$400.000</button>
+                      <button type="button" class="option-btn" data-name="ahorro" data-value="400">Más de $400.001</button>
+                    </div>
+                    <div class="row option-group">
+                      <label>¿Con cuál te identificas más?</label>
+                      <button type="button" class="option-btn" data-name="situacion" data-value="corriente-ok">Tengo cuenta corriente y no estoy en DICOM</button>
+                      <button type="button" class="option-btn" data-name="situacion" data-value="nocorriente">No tengo cuenta corriente</button>
+                      <button type="button" class="option-btn" data-name="situacion" data-value="dicom">Estoy en DICOM</button>
+                    </div>
+                    <div class="row"><button type="button" class="btn btn-primary btn-block" id="btnQuieroLlamen">Enviar</button></div>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+          <script type="text/javascript" src="/website_ap_sscl/static/src/js/landing_form.js"></script>
+        </body>
+      </html>
+    </template>
+  </data>
+</odoo>

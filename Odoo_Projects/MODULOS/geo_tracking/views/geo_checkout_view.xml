@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista heredada para agregar campos y botones de check-out -->
+    <record id="view_project_task_form_geo_tracking_checkout" model="ir.ui.view">
+        <field name="name">project.task.form.geo.tracking.checkout</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="geo_tracking.view_project_task_form_geo_tracking"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='geolocation']" position="inside">
+                <!-- Grupo para campos de Check-out -->
+                <group string="Datos del Check-Out">
+                    <field name="checkout_latitude" readonly="1" 
+                           widget="float" options="{'precision': 6}"
+                           invisible="not checkout_datetime"/>
+                    <field name="checkout_longitude" readonly="1" 
+                           widget="float" options="{'precision': 6}"
+                           invisible="not checkout_datetime"/>
+                    <field name="checkout_datetime" readonly="1"
+                           invisible="not checkout_datetime"/>
+                    <field name="checkout_distance_km" readonly="1" 
+                           widget="float" options="{'precision': 3}"
+                           invisible="not checkout_datetime"/>
+                </group>
+                
+                <!-- Grupo para duración de visita -->
+                <group string="Duración de Visita" invisible="not checkout_datetime">
+                    <field name="visit_duration" readonly="1" 
+                           widget="float" options="{'precision': 2}"/>
+                    <field name="visit_duration_formatted" readonly="1"/>
+                </group>
+                
+                <!-- Campo de estado siempre visible -->
+                <group string="Estado">
+                    <field name="checkin_status" readonly="1" widget="badge"
+                           decoration-success="checkin_status == 'checked_out'"
+                           decoration-warning="checkin_status == 'checked_in'"
+                           decoration-muted="checkin_status == 'none'"/>
+                </group>
+                
+                <!-- Botones adicionales -->
+                <div class="oe_button_box" style="text-align: center; margin-top: 20px;">
+                    <button string="Registrar Check-Out"
+                            type="object"
+                            name="get_checkout_location_button"
+                            class="btn-warning oe_highlight"
+                            icon="fa-sign-out"
+                            invisible="not partner_id or checkin_status != 'checked_in'"
+                            help="Registra tu ubicación al salir de la visita al cliente"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Actualizar el botón de check-in para mostrar el estado correcto -->
+    <record id="view_project_task_form_geo_tracking_status" model="ir.ui.view">
+        <field name="name">project.task.form.geo.tracking.status</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="geo_tracking.view_project_task_form_geo_tracking"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='get_location_button']" position="attributes">
+                <attribute name="invisible">not partner_id or checkin_status != 'none'</attribute>
+                <attribute name="help">Registra tu ubicación al llegar donde el cliente</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

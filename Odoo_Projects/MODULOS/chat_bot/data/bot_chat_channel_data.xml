@@ -1,0 +1,8 @@
+<!-- bot_chat/data/bot_chat_channel_data.xml -->
+<odoo noupdate="1">
+    <record id="bot_chat_channel" model="discuss.channel">
+        <field name="name">Bot Chat IA</field>
+        <field name="channel_type">channel</field>
+        <field name="uuid">bot_chat_ia</field>
+    </record>
+</odoo>

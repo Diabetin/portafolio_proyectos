@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_crm_lead_form_inherit_calendly_fields" model="ir.ui.view">
+      <field name="name">crm.lead.form.inherit.calendly.fields</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+      <field name="arch" type="xml">
+        
+        <!-- AGREGAR CAMPOS EN LA COLUMNA DERECHA DESPUÉS DE TAGS -->
+        <xpath expr="//field[@name='tag_ids']" position="after">
+          <field name="x_studio_renta"/>
+          <field name="x_studio_ahorro"/>
+          <field name="x_studio_situacion"/>
+        </xpath>
+        
+        <!-- PESTAÑAS ADICIONALES -->
+        <xpath expr="//notebook" position="inside">
+          <!-- Pestaña Calendly -->
+          <page name="calendly" string="Calendly">
+            <group>
+              <group string="Identificación y Enlaces">
+                <field name="x_studio_calendly_id_reunion"/>
+                <field name="x_studio_calendly_link_reunion"/>
+                <field name="x_studio_calendly_evento_utilizado"/>
+                <field name="x_studio_calendly_ip"/>
+              </group>
+              <group string="Fechas y Horarios">
+                <field name="x_studio_calendly_fecha_siguiente"/>
+                <field name="x_studio_calendly_fecha_ultima"/>
+                <field name="x_studio_calendly_fecha_ajustada"/>
+                <field name="x_studio_calendly_fecha_agendada"/>
+                <field name="x_studio_calendly_fecha_asignacion_llamado"/>
+                <field name="x_studio_calendly_fecha_perdido"/>
+              </group>
+              <group string="Gestión y Asignación">
+                <field name="x_studio_calendly_ejecutivo_llamaton"/>
+                <field name="x_studio_calendly_nombre_apellido"/>
+                <field name="x_studio_calendly_capacidad_inversion"/>
+              </group>
+              <group string="Estado de Sincronización">
+                <field name="x_studio_calendly_sync_status"/>
+                <field name="x_studio_calendly_last_sync"/>
+              </group>
+            </group>
+          </page>
+          
+          <!-- Pestaña: Datos Lead -->
+          <page name="datos_lead" string="Datos Lead">
+            <group>
+              <group string="Información Personal">
+                <field name="x_studio_lead_apellido"/>
+                <field name="x_studio_lead_record_id"/>
+                <field name="x_studio_lead_fecha_creado"/>
+                <field name="x_studio_lead_mes_ingreso"/>
+              </group>
+              <group string="Estado y Status">
+                <field name="x_studio_lead_status"/>
+                <field name="x_studio_lead_perdido"/>
+                <field name="x_studio_lead_ultima_modificacion_status"/>
+                <field name="x_studio_lead_ultima_modificacion_reunion"/>
+              </group>
+              <group string="Asignaciones y Equipos">
+                <field name="x_studio_lead_ejecutivo_asignado"/>
+                <field name="x_studio_lead_nombre_ejecutivo_asignado"/>
+                <field name="x_studio_lead_ejecutivos_ventas"/>
+                <field name="x_studio_lead_ejecutiva_promesa"/>
+                <field name="x_studio_lead_team"/>
+                <field name="x_studio_lead_team_leader"/>
+                <field name="x_studio_lead_team_leader_llamados"/>
+              </group>
+              <group string="Socios Comerciales">
+                <field name="x_studio_lead_socio_comercial"/>
+                <field name="x_studio_lead_socios_comerciales"/>
+              </group>
+              <group string="Fechas de Asignación">
+                <field name="x_studio_lead_fecha_asignacion_ejecutivo"/>
+                <field name="x_studio_lead_fecha_asignacion_call_sc"/>
+              </group>
+              <group string="UTM y Seguimiento">
+                <field name="x_studio_lead_utm_source"/>
+                <field name="x_studio_lead_utm_medium"/>
+                <field name="x_studio_lead_utm_campaign"/>
+                <field name="x_studio_lead_utm_term"/>
+              </group>
+              <group string="Calificación y Capacidades">
+                <field name="x_studio_lead_calificacion_fluent"/>
+                <field name="x_studio_lead_sueldo_liquido"/>
+                <field name="x_studio_lead_capacidad_ahorro"/>
+              </group>
+              <group string="Información Adicional">
+                <field name="x_studio_lead_reagendar"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

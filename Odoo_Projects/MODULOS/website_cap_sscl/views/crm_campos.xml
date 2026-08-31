@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record id="view_crm_lead_form_inherit_custom_fields" model="ir.ui.view">
+      <field name="name">crm.lead.form.inherit.custom.fields</field>
+      <field name="model">crm.lead</field>
+      <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='tag_ids']" position="after">
+          <field name="x_studio_renta"/>
+          <field name="x_studio_ahorro"/>
+          <field name="x_studio_situacion"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
+

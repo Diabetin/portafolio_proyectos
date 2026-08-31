@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.boleta.honorarios</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Emisor/anular Boletas Honorarios" string="Boletas Honorarios" name="boleta_honorarios_settings">
+                    <block title="Configuración SimpleAPI">
+                        <setting help="Configurar conexión con SimpleAPI Chile">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="simpleapi_api_key" class="col-lg-3 o_light_label"/>
+                                    <field name="simpleapi_api_key" placeholder="4648-N330-6392-2590-9354"/>
+                                </div>
+                                <div class="row">
+                                    <label for="simpleapi_base_url" class="col-lg-3 o_light_label"/>
+                                    <field name="simpleapi_base_url"/>
+                                </div>
+                                <div class="row">
+                                    <label for="simpleapi_timeout" class="col-lg-3 o_light_label"/>
+                                    <field name="simpleapi_timeout"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

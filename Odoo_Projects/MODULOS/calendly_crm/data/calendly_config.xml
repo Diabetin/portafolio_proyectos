@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- Token de acceso de Calendly -->
+    <record id="calendly_access_token" model="ir.config_parameter">
+      <field name="key">calendly.access.token</field>
+      <field name="value">eyJraWQiOiIxY2UxZTEzNjE3ZGNmNzY2YjNjZWJjY2Y4ZGM1YmFmYThhNjVlNjg0MDIzZjdjMzJiZTgzNDliMjM4MDEzNWI0IiwidHlwIjoiUEFUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJodHRwczovL2F1dGguY2FsZW5kbHkuY29tIiwiaWF0IjoxNzU4MDQ3NTg5LCJqdGkiOiIxYzg4MTEyNy05OWQ1LTQyY2EtYTcwMC0yMDljZDZiOTJmMjciLCJ1c2VyX3V1aWQiOiI3MTI1N2ExZS01MzAyLTQ4MTAtODU2My04NTVkN2JmZWU0MTYifQ.VLC2q7SAr-KqQw-pIMURUPYGxjyNdaU08_tHOVQuZ8r_vA4L-wOTeEBlj19HFcQDFifgtOBfduJL9cDH-45QKg</field>
+    </record>
+    
+    <!-- Webhook secret (obtener de cuenta desarrollador Calendly) -->
+    <record id="calendly_webhook_secret" model="ir.config_parameter">
+      <field name="key">calendly.webhook.secret</field>
+      <field name="value">TU_WEBHOOK_SECRET_AQUI</field>
+    </record>
+    
+    <!-- Organization URI (se obtendrá automáticamente) -->
+    <record id="calendly_organization_uri" model="ir.config_parameter">
+      <field name="key">calendly.organization.uri</field>
+      <field name="value"></field>
+    </record>
+    
+    <!-- URL del webhook -->
+    <record id="calendly_webhook_url" model="ir.config_parameter">
+      <field name="key">calendly.webhook.url</field>
+      <field name="value">https://tu-dominio-odoo.com/calendly/webhook</field>
+    </record>
+    
+    <!-- Habilitar sincronización -->
+    <record id="calendly_sync_enabled" model="ir.config_parameter">
+      <field name="key">calendly.sync.enabled</field>
+      <field name="value">True</field>
+    </record>
+  </data>
+</odoo>
