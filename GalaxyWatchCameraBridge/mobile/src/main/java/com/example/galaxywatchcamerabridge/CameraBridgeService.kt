@@ -119,107 +119,82 @@ class CameraBridgeService : LifecycleService() {
         val nodeId = targetNodeId ?: return
         isStartingConnection = true
         
-        AppLogger.log("Wi-Fi: Limpiando red...")
-        wifiP2pManager?.removeGroup(wifiP2pChannel, object : WifiP2pManager.ActionListener {
-            override fun onSuccess() { createWifiGroup(nodeId) }
-            override fun onFailure(reason: Int) { createWifiGroup(nodeId) }
-        })
-    }
-
-    private fun createWifiGroup(nodeId: String) {
-        AppLogger.log("Wi-Fi: Intentando crear grupo...")
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            AppLogger.log("Error: Sin permisos GPS. Fallback BT.")
-            startBluetoothFallback(nodeId)
-            return
+        val ip = getLocalIpAddress()
+        if (ip != null) {
+            AppLogger.log("Red local detectada: IP $ip")
+            startTcpServer(ip, nodeId)
+        } else {
+            AppLogger.log("No hay Wi-Fi ni Hotspot activo. Usando BT.")
+            startStreamChannel(nodeId)
         }
-
-        wifiP2pManager?.createGroup(wifiP2pChannel, object : WifiP2pManager.ActionListener {
-            override fun onSuccess() {
-                AppLogger.log("Wi-Fi: Grupo creado. Obteniendo IP...")
-                lifecycleScope.launch {
-                    delay(2000) // Tiempo para que el hardware asigne la IP
-                    requestWifiCredentials(nodeId)
-                }
-            }
-            override fun onFailure(reason: Int) {
-                AppLogger.log("Wi-Fi: Error createGroup ($reason). Fallback BT.")
-                startBluetoothFallback(nodeId)
-            }
-        })
     }
 
-    private fun requestWifiCredentials(nodeId: String) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
-        
-        wifiP2pManager?.requestGroupInfo(wifiP2pChannel) { group: WifiP2pGroup? ->
-            if (group != null) {
-                val ssid = group.networkName
-                val pass = group.passphrase
-                val ip = "192.168.49.1"
+    private fun getLocalIpAddress(): String? {
+        try {
+            val interfaces = java.net.NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val intf = interfaces.nextElement()
+                if (intf.isLoopback || !intf.isUp) continue
                 
-                AppLogger.log("RED -> SSID: $ssid | PW: $pass")
-                
-                val json = JSONObject().apply {
-                    put("ssid", ssid)
-                    put("password", pass)
-                    put("ip", ip)
-                }.toString()
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    try {
-                        Wearable.getMessageClient(this@CameraBridgeService).sendMessage(nodeId, "/wifi_info", json.toByteArray()).await()
-                        AppLogger.log("Wi-Fi: Credenciales enviadas al reloj.")
-                        startTcpServer()
-                    } catch (e: Exception) { 
-                        AppLogger.log("Error envío BT. Fallback.")
-                        startBluetoothFallback(nodeId)
+                val addrs = intf.inetAddresses
+                while (addrs.hasMoreElements()) {
+                    val addr = addrs.nextElement()
+                    if (!addr.isLoopbackAddress && addr is java.net.Inet4Address) {
+                        val ip = addr.hostAddress
+                        // Ignorar IPs de redes móviles (usualmente no son 192.168 o 10.x)
+                        // Hotspot suele ser 192.168.43.x, WiFi de casa 192.168.x.x o 10.x.x.x
+                        if (ip.startsWith("192.168.") || ip.startsWith("10.")) {
+                            return ip
+                        }
                     }
                 }
-            } else {
-                AppLogger.log("Error: Group Info NULL. Fallback BT.")
-                startBluetoothFallback(nodeId)
             }
-        }
+        } catch (e: Exception) {}
+        return null
     }
 
-    private fun startTcpServer() {
+    private fun startTcpServer(ip: String, nodeId: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 serverSocket?.close()
-                serverSocket = ServerSocket(8080).apply {
+                serverSocket = java.net.ServerSocket(8080).apply {
                     reuseAddress = true
-                    soTimeout = 15000 // Timeout de 15 segundos en el socket directamente
+                    soTimeout = 30000 
                 }
                 
-                AppLogger.log("TCP: Servidor activo (8080). Esperando...")
+                // Enviar la IP al reloj para que se conecte directamente sin diálogos
+                val json = org.json.JSONObject().apply { put("ip", ip) }.toString()
+                com.google.android.gms.wearable.Wearable.getMessageClient(this@CameraBridgeService)
+                    .sendMessage(nodeId, "/lan_info", json.toByteArray()).await()
+                
+                AppLogger.log("TCP: Servidor (8080). Esperando al reloj...")
                 
                 clientSocket = serverSocket?.accept()
                 
-                AppLogger.log("TCP: ¡RELOJ CONECTADO!")
-                videoOutputStream = DataOutputStream(clientSocket!!.getOutputStream())
+                AppLogger.log("TCP: ¡RELOJ CONECTADO POR RED LOCAL!")
+                videoOutputStream = java.io.DataOutputStream(clientSocket!!.getOutputStream())
                 isStartingConnection = false
                 startStreamingJob()
             } catch (e: Exception) {
                 AppLogger.log("TCP: Fallo o Timeout (${e.message}). Usando BT.")
-                startBluetoothFallback(targetNodeId ?: "")
+                startStreamChannel(nodeId)
             }
         }
     }
 
-    private fun startBluetoothFallback(nodeId: String) {
+    private fun startStreamChannel(nodeId: String) {
         isStartingConnection = false
         if (nodeId.isEmpty()) return
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                AppLogger.log("BT: Abriendo canal de respaldo...")
+                AppLogger.log("Iniciando transmisión directa...")
                 val channelClient = Wearable.getChannelClient(this@CameraBridgeService)
                 val channel = channelClient.openChannel(nodeId, "/camera_stream").await()
                 videoOutputStream = DataOutputStream(channelClient.getOutputStream(channel).await())
-                AppLogger.log("BT: Canal abierto.")
+                AppLogger.log("Canal de transmisión abierto con éxito.")
                 startStreamingJob()
             } catch (e: Exception) {
-                AppLogger.log("BT: Fallo crítico. Cámara sola.")
+                AppLogger.log("Error crítico abriendo canal (${e.message}). Cámara sola.")
                 withContext(Dispatchers.Main) { startCamera() }
             }
         }
@@ -240,7 +215,7 @@ class CameraBridgeService : LifecycleService() {
                     out.flush()
                 }
             } catch (e: Exception) {
-                AppLogger.log("Stream: Error de envío. Cerrando.")
+                AppLogger.log("Stream: Error de envío (${e.message}). Cerrando.")
                 withContext(Dispatchers.Main) { closeVideoStream() }
                 stopSelf()
             }

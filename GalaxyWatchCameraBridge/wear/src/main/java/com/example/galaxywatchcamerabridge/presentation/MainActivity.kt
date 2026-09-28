@@ -265,9 +265,17 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
     override fun onMessageReceived(event: MessageEvent) {
         Log.d(TAG, "Mensaje recibido: ${event.path}")
         when (event.path) {
-            "/wifi_info" -> {
-                val json = JSONObject(String(event.data))
-                connectToWifi(json.getString("ssid"), json.getString("password"), json.getString("ip"))
+            "/lan_info" -> {
+                try {
+                    val json = org.json.JSONObject(String(event.data))
+                    val ip = json.getString("ip")
+                    val msg = "Recibida IP Local del teléfono: $ip"
+                    Log.d(TAG, msg)
+                    sendLogToPhone(msg)
+                    startReadingSocket(ip)
+                } catch (e: Exception) {
+                    sendLogToPhone("Error parseando /lan_info: $e")
+                }
             }
             "/camera_status" -> {
                 val status = String(event.data)
