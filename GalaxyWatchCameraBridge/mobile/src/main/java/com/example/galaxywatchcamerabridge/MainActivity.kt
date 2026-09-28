@@ -110,4 +110,18 @@ class MainActivity : AppCompatActivity() {
             statusTextView.text = "❌ Faltan permisos de Cámara, Micrófono o Notificaciones para funcionar."
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        val intent = android.content.Intent(this, CameraBridgeService::class.java)
+        intent.action = WatchMessageReceiverService.ACTION_RESUME_CAMERA
+        try { startService(intent) } catch(e:Exception) {}
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val intent = android.content.Intent(this, CameraBridgeService::class.java)
+        intent.action = WatchMessageReceiverService.ACTION_PAUSE_CAMERA
+        try { startService(intent) } catch(e:Exception) {}
+    }
 }

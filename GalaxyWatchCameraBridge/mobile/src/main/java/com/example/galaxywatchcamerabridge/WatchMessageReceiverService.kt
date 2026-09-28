@@ -13,6 +13,8 @@ class WatchMessageReceiverService : WearableListenerService() {
         const val ACTION_CAPTURE = "com.example.galaxywatchcamerabridge.CAPTURE"
         const val ACTION_FLIP_CAMERA = "com.example.galaxywatchcamerabridge.FLIP_CAMERA"
         const val ACTION_SWITCH_MODE = "com.example.galaxywatchcamerabridge.SWITCH_MODE"
+        const val ACTION_PAUSE_CAMERA = "com.example.galaxywatchcamerabridge.PAUSE_CAMERA"
+        const val ACTION_RESUME_CAMERA = "com.example.galaxywatchcamerabridge.RESUME_CAMERA"
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {

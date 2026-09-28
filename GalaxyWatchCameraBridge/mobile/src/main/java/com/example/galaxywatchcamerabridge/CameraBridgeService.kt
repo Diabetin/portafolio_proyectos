@@ -70,6 +70,7 @@ class CameraBridgeService : LifecycleService() {
     private var clientSocket: Socket? = null
     
     private var isStartingConnection = false
+    private var isPaused = false
 
     override fun onCreate() {
         super.onCreate()
@@ -112,6 +113,20 @@ class CameraBridgeService : LifecycleService() {
             WatchMessageReceiverService.ACTION_STOP_CAMERA -> {
                 AppLogger.log("STOP recibido.")
                 stopSelf()
+            }
+            WatchMessageReceiverService.ACTION_PAUSE_CAMERA -> {
+                if (cameraProvider != null && !isPaused) {
+                    isPaused = true
+                    cameraProvider?.unbindAll()
+                    AppLogger.log("App en segundo plano: Cámara pausada.")
+                }
+            }
+            WatchMessageReceiverService.ACTION_RESUME_CAMERA -> {
+                if (isPaused) {
+                    isPaused = false
+                    AppLogger.log("App en primer plano: Reanudando cámara...")
+                    bindCamera()
+                }
             }
             WatchMessageReceiverService.ACTION_CAPTURE -> {
                 if (isVideoMode) toggleRecording() else takePhoto()
