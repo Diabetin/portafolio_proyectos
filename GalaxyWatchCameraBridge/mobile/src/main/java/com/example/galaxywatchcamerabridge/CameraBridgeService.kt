@@ -23,6 +23,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import android.util.Range
+import android.hardware.camera2.CaptureRequest
+import androidx.camera.camera2.interop.Camera2CameraControl
+import androidx.camera.camera2.interop.CaptureRequestOptions
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.wearable.Wearable
@@ -92,7 +96,17 @@ class CameraBridgeService : LifecycleService() {
                 }
 
                 targetNodeId = intent.getStringExtra("node_id")
-                startForeground(NOTIFICATION_ID, createNotification())
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    try {
+                        startForeground(NOTIFICATION_ID, createNotification(), 
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or 
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+                    } catch (e: Exception) {
+                        startForeground(NOTIFICATION_ID, createNotification())
+                    }
+                } else {
+                    startForeground(NOTIFICATION_ID, createNotification())
+                }
                 cleanupAndStartWifi()
             }
             WatchMessageReceiverService.ACTION_STOP_CAMERA -> {
@@ -252,13 +266,25 @@ class CameraBridgeService : LifecycleService() {
             val selector = CameraSelector.Builder().requireLensFacing(currentLensFacing).build()
             
             provider.unbindAll()
-
+            
+            val camera: Camera
             if (isVideoMode) {
                 videoCapture = VideoCapture.withOutput(Recorder.Builder().setQualitySelector(QualitySelector.from(Quality.HIGHEST)).build())
-                provider.bindToLifecycle(this, selector, analyzer, videoCapture)
+                camera = provider.bindToLifecycle(this, selector, analyzer, videoCapture)
+                
+                // Forzar 60 FPS mediante Camera2Interop
+                try {
+                    val camera2Control = Camera2CameraControl.from(camera.cameraControl)
+                    camera2Control.captureRequestOptions = CaptureRequestOptions.Builder()
+                        .setCaptureRequestOption(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, Range(60, 60))
+                        .build()
+                    AppLogger.log("Configurado a 60 FPS.")
+                } catch (e: Exception) {
+                    AppLogger.log("No se pudo forzar 60 FPS: ${e.message}")
+                }
             } else {
                 imageCapture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build()
-                provider.bindToLifecycle(this, selector, analyzer, imageCapture)
+                camera = provider.bindToLifecycle(this, selector, analyzer, imageCapture)
             }
             AppLogger.log("Cámara: LISTA (${if (isWifi) "WiFi-HD" else "BT-SD"})")
         } catch (e: Exception) { AppLogger.log("Camera: Error Vincular $e") }
@@ -275,9 +301,17 @@ class CameraBridgeService : LifecycleService() {
                 if (currentLensFacing == CameraSelector.LENS_FACING_FRONT) postScale(-1f, 1f, bmp.width / 2f, bmp.height / 2f)
             }
             val rotated = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, true)
-            val width = if (isWifi) 720 else 320
-            val height = if (isWifi) 1280 else 320
-            val scaled = Bitmap.createScaledBitmap(rotated, width, height, true)
+            
+            // Recorte cuadrado 1:1 centrado para llenar la pantalla circular del reloj como en la app de Samsung
+            val minEdge = Math.min(rotated.width, rotated.height)
+            val xOffset = (rotated.width - minEdge) / 2
+            val yOffset = (rotated.height - minEdge) / 2
+            val squareBmp = Bitmap.createBitmap(rotated, xOffset, yOffset, minEdge, minEdge)
+
+            // Redimensionar al tamaño de destino según conexión
+            val targetSize = if (isWifi) 640 else 320
+            val scaled = Bitmap.createScaledBitmap(squareBmp, targetSize, targetSize, true)
+            
             val stream = ByteArrayOutputStream()
             scaled.compress(Bitmap.CompressFormat.JPEG, if (isWifi) 60 else 30, stream)
             frameQueue.trySend(stream.toByteArray())
@@ -338,7 +372,11 @@ class CameraBridgeService : LifecycleService() {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/GalaxyWatchCamera")
         }
         var pending = cap.output.prepareRecording(this, MediaStoreOutputOptions.Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI).setContentValues(cv).build())
-        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PermissionChecker.PERMISSION_GRANTED) pending = pending.withAudioEnabled()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            pending = pending.withAudioEnabled()
+        } else {
+            AppLogger.log("Advertencia: Sin permiso de Audio.")
+        }
         recording = pending.start(ContextCompat.getMainExecutor(this)) { ev ->
             if (ev is VideoRecordEvent.Start) sendStatusToWatch("REC_START")
             else if (ev is VideoRecordEvent.Finalize) { AppLogger.log("¡Video Guardado!"); sendStatusToWatch("REC_STOP") }

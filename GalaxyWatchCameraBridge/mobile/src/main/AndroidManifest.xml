@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Permisos para Wi-Fi Direct -->
@@ -36,7 +37,7 @@
         <!-- Servicio de la cámara en Foreground -->
         <service
             android:name=".CameraBridgeService"
-            android:foregroundServiceType="camera"
+            android:foregroundServiceType="camera|microphone"
             android:exported="false" />
 
         <!-- Listener que escucha al reloj -->
