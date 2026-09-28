@@ -187,21 +187,21 @@ class CameraBridgeService : LifecycleService() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 serverSocket?.close()
-                serverSocket = ServerSocket(8080).apply { reuseAddress = true }
+                serverSocket = ServerSocket(8080).apply {
+                    reuseAddress = true
+                    soTimeout = 15000 // Timeout de 15 segundos en el socket directamente
+                }
                 
                 AppLogger.log("TCP: Servidor activo (8080). Esperando...")
                 
-                // Timeout de 15 segundos para la conexión Wi-Fi
-                withTimeout(15000) {
-                    clientSocket = serverSocket?.accept()
-                }
+                clientSocket = serverSocket?.accept()
                 
                 AppLogger.log("TCP: ¡RELOJ CONECTADO!")
                 videoOutputStream = DataOutputStream(clientSocket!!.getOutputStream())
                 isStartingConnection = false
                 startStreamingJob()
             } catch (e: Exception) {
-                AppLogger.log("TCP: Fallo o Timeout. Usando BT.")
+                AppLogger.log("TCP: Fallo o Timeout (${e.message}). Usando BT.")
                 startBluetoothFallback(targetNodeId ?: "")
             }
         }

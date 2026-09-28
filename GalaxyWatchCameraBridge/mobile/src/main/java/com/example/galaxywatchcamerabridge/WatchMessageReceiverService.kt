@@ -22,6 +22,10 @@ class WatchMessageReceiverService : WearableListenerService() {
         AppLogger.log(msg)
 
         when (messageEvent.path) {
+            "/camera_action/watch_log" -> {
+                AppLogger.log("⌚ RELOJ: " + String(messageEvent.data))
+                return
+            }
             "/camera_action/start" -> {
                 val intent = Intent(this, CameraBridgeService::class.java).apply {
                     action = ACTION_START_CAMERA

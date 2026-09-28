@@ -49,6 +49,25 @@ class MainActivity : AppCompatActivity() {
             textSize = 18f
             setPadding(0, 0, 0, 40)
         }
+        
+        val connectButton = android.widget.Button(this).apply {
+            text = "Lanzar Conexión por WiFi-Direct"
+            setOnClickListener {
+                val intent = android.content.Intent(this@MainActivity, CameraBridgeService::class.java)
+                intent.action = WatchMessageReceiverService.ACTION_START_CAMERA
+                intent.putExtra("node_id", "")
+                startService(intent)
+            }
+        }
+        
+        val disconnectButton = android.widget.Button(this).apply {
+            text = "Destruir Conexión"
+            setOnClickListener {
+                val intent = android.content.Intent(this@MainActivity, CameraBridgeService::class.java)
+                intent.action = WatchMessageReceiverService.ACTION_STOP_CAMERA
+                startService(intent)
+            }
+        }
 
         logTextView = TextView(this).apply {
             textSize = 12f
@@ -60,6 +79,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         layout.addView(statusTextView)
+        layout.addView(connectButton)
+        layout.addView(disconnectButton)
         layout.addView(scrollView)
         setContentView(layout)
 

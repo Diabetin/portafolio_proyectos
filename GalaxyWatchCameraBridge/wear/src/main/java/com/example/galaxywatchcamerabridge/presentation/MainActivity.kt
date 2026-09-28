@@ -71,7 +71,17 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
     private val channelCallback = object : ChannelClient.ChannelCallback() {
         override fun onChannelOpened(channel: ChannelClient.Channel) {
             Log.d(TAG, "Canal abierto: ${channel.path}")
+            sendLogToPhone("Canal BT abierto: ${channel.path}")
             if (channel.path == "/camera_stream") startReadingStream(channel)
+        }
+    }
+
+    private fun sendLogToPhone(msg: String) {
+        val node = connectedPhoneNodeId ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            try { 
+                Wearable.getMessageClient(this@MainActivity).sendMessage(node, "/camera_action/watch_log", msg.toByteArray()).await() 
+            } catch (e: Exception) {}
         }
     }
 
@@ -90,11 +100,18 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
         permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES))
 
         setContent {
+            var isConnecting by remember { mutableStateOf(false) }
+
             WatchCameraScreen(
                 frame = currentFrame,
                 isConnected = connectedPhoneNodeId != null,
+                isConnecting = isConnecting,
                 cameraMode = cameraMode,
                 isRecording = isRecording,
+                onConnectClick = {
+                    isConnecting = true
+                    detectPhoneAndStartCamera()
+                },
                 onCaptureClick = { 
                     if (cameraMode == "MODE_PHOTO") mediaActionSound.play(MediaActionSound.SHUTTER_CLICK)
                     else mediaActionSound.play(if (isRecording) MediaActionSound.STOP_VIDEO_RECORDING else MediaActionSound.START_VIDEO_RECORDING)
@@ -107,25 +124,51 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
     }
 
     private fun connectToWifi(ssid: String, pass: String, ip: String) {
-        Log.d(TAG, "Intentando conectar Wi-Fi: $ssid")
-        val specifier = WifiNetworkSpecifier.Builder().setSsid(ssid).setWpa2Passphrase(pass).build()
-        val request = NetworkRequest.Builder()
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .setNetworkSpecifier(specifier).build()
+        val msg = "Intentando conectar Wi-Fi: $ssid"
+        Log.d(TAG, msg)
+        sendLogToPhone(msg)
+        try {
+            // Aseguramos que el callback anterior se desregistre para evitar crashes por múltiples solicitudes
+            networkCallback?.let { 
+                try { connectivityManager?.unregisterNetworkCallback(it) } catch (e: Exception) {}
+            }
+            
+            // Para setSsid() algunas versiones de Android exigen que el SSID esté entre comillas dobles
+            val quotedSsid = if (ssid.startsWith("\"") && ssid.endsWith("\"")) ssid else "\"$ssid\""
+            sendLogToPhone("SSID formateado: $quotedSsid")
+            
+            val specifier = WifiNetworkSpecifier.Builder()
+                .setSsid(quotedSsid)
+                .setWpa2Passphrase(pass)
+                .build()
+                
+            val request = NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .setNetworkSpecifier(specifier).build()
 
-        connectivityManager = getSystemService(ConnectivityManager::class.java)
-        networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                Log.d(TAG, "Wi-Fi Disponible. Enlazando...")
-                connectivityManager?.bindProcessToNetwork(network)
-                startReadingSocket(ip)
+            connectivityManager = getSystemService(ConnectivityManager::class.java)
+            networkCallback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    val availMsg = "Wi-Fi Disponible. Enlazando a $ip..."
+                    Log.d(TAG, availMsg)
+                    sendLogToPhone(availMsg)
+                    connectivityManager?.bindProcessToNetwork(network)
+                    startReadingSocket(ip)
+                }
+                override fun onUnavailable() {
+                    val unavailMsg = "Wi-Fi No disponible."
+                    Log.e(TAG, unavailMsg)
+                    sendLogToPhone(unavailMsg)
+                }
             }
-            override fun onUnavailable() {
-                Log.e(TAG, "Wi-Fi No disponible.")
-            }
+            connectivityManager?.requestNetwork(request, networkCallback!!)
+            sendLogToPhone("requestNetwork ejecutado. Esperando onAvailable...")
+        } catch (e: Exception) {
+            val errMsg = "Error en connectToWifi: $e"
+            Log.e(TAG, errMsg)
+            sendLogToPhone(errMsg)
         }
-        connectivityManager?.requestNetwork(request, networkCallback!!)
     }
 
     private fun startReadingSocket(ip: String) {
@@ -133,10 +176,14 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
         isStreaming = true
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                Log.d(TAG, "Abriendo Socket TCP a $ip...")
+                val msg = "Abriendo Socket TCP a $ip..."
+                Log.d(TAG, msg)
+                sendLogToPhone(msg)
                 videoSocket = Socket(ip, 8080)
                 val dis = DataInputStream(videoSocket!!.getInputStream())
-                Log.d(TAG, "Socket Conectado. Leyendo frames...")
+                val succMsg = "Socket Conectado. Leyendo frames..."
+                Log.d(TAG, succMsg)
+                sendLogToPhone(succMsg)
                 while (isStreaming) {
                     val size = dis.readInt()
                     if (size in 1..5_000_000) {
@@ -147,7 +194,9 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
                     } else break
                 }
             } catch (e: Exception) { 
-                Log.e(TAG, "Error Socket: $e")
+                val errMsg = "Error Socket: $e"
+                Log.e(TAG, errMsg)
+                sendLogToPhone(errMsg)
                 isStreaming = false 
             }
         }
@@ -182,12 +231,17 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
         wifiLock?.acquire()
         Wearable.getMessageClient(this).addListener(this)
         Wearable.getChannelClient(this).registerChannelCallback(channelCallback)
-        detectPhoneAndStartCamera()
+        // detectPhoneAndStartCamera() -> Now handled by 'Conectar' button
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause: Limpiando conexiones...")
+        Log.d(TAG, "onPause: (No limpiamos conexiones para evitar cortar el diálogo de Wi-Fi)")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy: Limpiando conexiones...")
         if (wakeLock?.isHeld == true) wakeLock?.release()
         if (wifiLock?.isHeld == true) wifiLock?.release()
         
@@ -205,8 +259,9 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
         networkCallback = null
         connectivityManager?.bindProcessToNetwork(null)
         currentFrame = null
+        mediaActionSound.release()
     }
-
+    
     override fun onMessageReceived(event: MessageEvent) {
         Log.d(TAG, "Mensaje recibido: ${event.path}")
         when (event.path) {
@@ -252,15 +307,10 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
             }
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mediaActionSound.release()
-    }
 }
 
 @Composable
-fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, cameraMode: String, isRecording: Boolean, onCaptureClick: () -> Unit, onFlipClick: () -> Unit, onSwitchModeClick: () -> Unit) {
+fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, isConnecting: Boolean, cameraMode: String, isRecording: Boolean, onConnectClick: () -> Unit, onCaptureClick: () -> Unit, onFlipClick: () -> Unit, onSwitchModeClick: () -> Unit) {
     val haptic = LocalHapticFeedback.current
     var showFlash by remember { mutableStateOf(false) }
     LaunchedEffect(showFlash) { if (showFlash) { kotlinx.coroutines.delay(100); showFlash = false } }
@@ -295,10 +345,16 @@ fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, cameraMode: String, 
                     }
                 }
             } else {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    CircularProgressIndicator(indicatorColor = Color.Red)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = if (isConnected) "Conectando..." else "Buscando teléfono...", color = Color.White)
+                if (!isConnecting) {
+                    Button(onClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress); onConnectClick() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
+                        Text("Conectar", color = Color.White)
+                    }
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        CircularProgressIndicator(indicatorColor = Color.Red)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = if (isConnected) "Conectando..." else "Buscando teléfono...", color = Color.White)
+                    }
                 }
             }
         }
