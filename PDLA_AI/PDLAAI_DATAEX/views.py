@@ -21,3 +21,4 @@ def extractor_view(request):
         })
 
     return render(request, 'upload.html')
+
