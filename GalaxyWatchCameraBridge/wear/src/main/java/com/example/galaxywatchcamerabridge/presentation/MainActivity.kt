@@ -17,6 +17,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.unit.sp
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
@@ -118,7 +119,10 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
                     sendActionToPhone("/camera_action/capture") 
                 },
                 onFlipClick = { sendActionToPhone("/camera_action/flip") },
-                onSwitchModeClick = { sendActionToPhone("/camera_action/switch_mode") }
+                onSwitchModeClick = { sendActionToPhone("/camera_action/switch_mode") },
+                onZoomChange = { zoomLevel -> 
+                    sendActionToPhone("/camera_action/zoom", zoomLevel.toString().toByteArray()) 
+                }
             )
         }
     }
@@ -304,12 +308,12 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
         }
     }
 
-    private fun sendActionToPhone(path: String) {
+    private fun sendActionToPhone(path: String, payload: ByteArray = byteArrayOf()) {
         val node = connectedPhoneNodeId ?: return
         lifecycleScope.launch(Dispatchers.IO) {
             try { 
                 Log.d(TAG, "Enviando a teléfono: $path")
-                Wearable.getMessageClient(this@MainActivity).sendMessage(node, path, byteArrayOf()).await() 
+                Wearable.getMessageClient(this@MainActivity).sendMessage(node, path, payload).await() 
             } catch (e: Exception) {
                 Log.e(TAG, "Error enviando $path: $e")
             }
@@ -318,9 +322,10 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
 }
 
 @Composable
-fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, isConnecting: Boolean, cameraMode: String, isRecording: Boolean, onConnectClick: () -> Unit, onCaptureClick: () -> Unit, onFlipClick: () -> Unit, onSwitchModeClick: () -> Unit) {
+fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, isConnecting: Boolean, cameraMode: String, isRecording: Boolean, onConnectClick: () -> Unit, onCaptureClick: () -> Unit, onFlipClick: () -> Unit, onSwitchModeClick: () -> Unit, onZoomChange: (Float) -> Unit) {
     val haptic = LocalHapticFeedback.current
     var showFlash by remember { mutableStateOf(false) }
+    var zoomLevel by remember { mutableStateOf(0f) }
     LaunchedEffect(showFlash) { if (showFlash) { kotlinx.coroutines.delay(100); showFlash = false } }
 
     Scaffold(timeText = { TimeText() }) {
@@ -330,6 +335,25 @@ fun WatchCameraScreen(frame: Bitmap?, isConnected: Boolean, isConnecting: Boolea
                 AnimatedVisibility(visible = showFlash, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.8f)))
                 }
+                
+                // Zoom Controls
+                Row(modifier = Modifier.fillMaxSize().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Button(onClick = { 
+                        zoomLevel = (zoomLevel - 0.1f).coerceAtLeast(0f)
+                        onZoomChange(zoomLevel)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray.copy(alpha = 0.6f)), modifier = Modifier.size(24.dp), shape = CircleShape) {
+                        Text("-", color = Color.White, fontSize = 12.sp)
+                    }
+                    Button(onClick = { 
+                        zoomLevel = (zoomLevel + 0.1f).coerceAtMost(1f)
+                        onZoomChange(zoomLevel)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray.copy(alpha = 0.6f)), modifier = Modifier.size(24.dp), shape = CircleShape) {
+                        Text("+", color = Color.White, fontSize = 12.sp)
+                    }
+                }
+
                 if (isRecording) {
                     Row(modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp).background(Color.Black.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(8.dp).background(Color.Red, CircleShape))

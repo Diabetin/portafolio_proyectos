@@ -52,6 +52,7 @@ class CameraBridgeService : LifecycleService() {
     private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
     private var cameraProvider: ProcessCameraProvider? = null
+    private var cameraControl: CameraControl? = null
     
     private var targetNodeId: String? = null
     private var currentLensFacing = CameraSelector.LENS_FACING_BACK
@@ -139,6 +140,10 @@ class CameraBridgeService : LifecycleService() {
                 isVideoMode = !isVideoMode
                 startCamera()
                 sendStatusToWatch(if (isVideoMode) "MODE_VIDEO" else "MODE_PHOTO")
+            }
+            WatchMessageReceiverService.ACTION_ZOOM -> {
+                val zoomLevel = intent.getFloatExtra("zoom_level", 0f)
+                cameraControl?.setLinearZoom(zoomLevel)
             }
         }
         return START_NOT_STICKY
@@ -263,6 +268,7 @@ class CameraBridgeService : LifecycleService() {
         }
     }
 
+    @androidx.camera.camera2.interop.ExperimentalCamera2Interop
     private fun bindCamera() {
         val provider = cameraProvider ?: return
         try {
@@ -301,6 +307,7 @@ class CameraBridgeService : LifecycleService() {
                 imageCapture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build()
                 camera = provider.bindToLifecycle(this, selector, analyzer, imageCapture)
             }
+            cameraControl = camera.cameraControl
             AppLogger.log("Cámara: LISTA (${if (isWifi) "WiFi-HD" else "BT-SD"})")
         } catch (e: Exception) { AppLogger.log("Camera: Error Vincular $e") }
     }

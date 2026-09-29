@@ -15,6 +15,7 @@ class WatchMessageReceiverService : WearableListenerService() {
         const val ACTION_SWITCH_MODE = "com.example.galaxywatchcamerabridge.SWITCH_MODE"
         const val ACTION_PAUSE_CAMERA = "com.example.galaxywatchcamerabridge.PAUSE_CAMERA"
         const val ACTION_RESUME_CAMERA = "com.example.galaxywatchcamerabridge.RESUME_CAMERA"
+        const val ACTION_ZOOM = "com.example.galaxywatchcamerabridge.ZOOM"
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
@@ -50,6 +51,13 @@ class WatchMessageReceiverService : WearableListenerService() {
             "/camera_action/flip" -> {
                 val intent = Intent(this, CameraBridgeService::class.java).apply {
                     action = ACTION_FLIP_CAMERA
+                }
+                startService(intent)
+            }
+            "/camera_action/zoom" -> {
+                val intent = Intent(this, CameraBridgeService::class.java).apply {
+                    action = ACTION_ZOOM
+                    putExtra("zoom_level", String(messageEvent.data).toFloatOrNull() ?: 0f)
                 }
                 startService(intent)
             }
